@@ -13,9 +13,9 @@ class TestH5Tag(unittest.TestCase):
         firefox_options.add_argument("--disable-dev-shm-usage")
         self.driver = webdriver.Firefox(options=firefox_options)
 
-    def test_h5_tag_content(self):
+  def test_h5_tag_content(self):
         driver = self.driver
-       driver.get("http://10.48.228.113")  # Replace with your target website (cluster IP!)
+        driver.get("http://10.48.228.113")
         
         # Locate the <h5> tag and get its text
         h5_text = driver.find_element(By.TAG_NAME, "h5").text
