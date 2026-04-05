@@ -1,14 +1,12 @@
 pipeline {
     agent any 
-
     environment {
         DOCKER_CREDENTIALS_ID = 'roseaw-dockerhub'
-        DOCKER_IMAGE = 'cithit/neredis'                                                                   //<------change this
+        DOCKER_IMAGE = 'cithit/neredis'
         IMAGE_TAG = "build-${BUILD_NUMBER}"
-        GITHUB_URL = 'https://github.com/ShrikarNeredimelli/225-lab3-6.git'                                          //<------change this
-        KUBECONFIG = credentials('neredis-225-sp26')                                                         //<------change this
+        GITHUB_URL = 'https://github.com/ShrikarNeredimelli/225-lab3-6.git'
+        KUBECONFIG = credentials('neredis-225-sp26')
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -16,19 +14,17 @@ pipeline {
                           userRemoteConfigs: [[url: "${GITHUB_URL}"]]])
             }
         }
-
         stage('Lint HTML') {
             steps {
                 sh 'npm install htmlhint --save-dev'
                 sh 'npx htmlhint *.html'
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
                     docker.withRegistry('https://registry-1.docker.io', 'roseaw-dockerhub') {
-                        docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}", "-f Dockerfile.build .")
+                        docker.build("${DOCKER_IMAGE}:${IMAGE_TAG}", "--no-cache -f Dockerfile.build .")
                     }
                 }
             }
@@ -42,19 +38,15 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy to Dev Environment') {
             steps {
                 script {
-                    // Set up Kubernetes configuration using the specified KUBECONFIG
                     def kubeConfig = readFile(KUBECONFIG)
-                    // Update deployment-dev.yaml to use the new image tag
                     sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
                     sh "kubectl apply -f deployment-dev.yaml"
                 }
             }
         }
-
         stage("Run Acceptance Tests") {
             steps {
                 script {
@@ -67,12 +59,9 @@ pipeline {
                 }
             }
         }
-
         stage('Deploy to Prod Environment') {
             steps {
                 script {
-                    // Set up Kubernetes configuration using the specified KUBECONFIG
-                    //sh "ls -la"
                     sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-prod.yaml"
                     sh "cd .."
                     sh "kubectl apply -f deployment-prod.yaml"
@@ -88,7 +77,6 @@ pipeline {
         }
     }
     post {
-        
         success {
             slackSend color: "good", message: "Build Completed: ${env.JOB_NAME} ${env.BUILD_NUMBER}"
         }
