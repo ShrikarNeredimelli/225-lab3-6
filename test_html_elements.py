@@ -13,7 +13,7 @@ class TestH5Tag(unittest.TestCase):
 
     def test_h5_tag_content(self):
         driver = self.driver
-        driver.get("http://10.48.228.113")
+        driver.get("http://neredis.cit225.com")
         h5_text = driver.find_element(By.TAG_NAME, "h5").text
         self.assertEqual("Lab 3-6 Works!", h5_text, "The <h5> tag does not contain the text 'Lab 3-6 Works!'")
 
