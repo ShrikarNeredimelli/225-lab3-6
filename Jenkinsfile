@@ -38,17 +38,18 @@ pipeline {
                 }
             }
         }
-        stage('Deploy to Dev Environment') {
-            steps {
-                script {
-                    def kubeConfig = readFile(KUBECONFIG)
-                    sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
-                    sh "kubectl apply -f deployment-dev.yaml"
-                    sh "kubectl rollout status deployment/dev-deployment"
-                    sh "sleep 10"
-                }
-            }
+      stage('Deploy to Dev Environment') {
+    steps {
+        script {
+            def kubeConfig = readFile(KUBECONFIG)
+            sh "sed -i 's|${DOCKER_IMAGE}:latest|${DOCKER_IMAGE}:${IMAGE_TAG}|' deployment-dev.yaml"
+            sh "kubectl apply -f deployment-dev.yaml"
+            sh "kubectl rollout restart deployment/dev-deployment"
+            sh "kubectl rollout status deployment/dev-deployment"
+            sh "sleep 15"
         }
+    }
+}
         stage("Run Acceptance Tests") {
             steps {
                 script {
