@@ -23,8 +23,9 @@ kind: Ingress
 metadata:
   name: nginx
 spec:
+spec:
   rules: 
-  - host: 
+  - host: neredis.cit225.com
     http:
       paths:
       - path: /
